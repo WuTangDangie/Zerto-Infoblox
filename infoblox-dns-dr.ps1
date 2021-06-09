@@ -9,7 +9,7 @@ $protectedsite = '-mdc' # Main Data Center
 $failoversite = '-dr' # Disaster Recovery
 
 # Connect to Infoblox
-$infobloxcred = Import-Clixml -Path C:\Users\u1088196\dred\zerto-dred.xml
+$infobloxcred = Import-Clixml -Path C:\scripts\infoblox-cred.xml
 Set-IBConfig -ProfileName 'mygrid' -WAPIHost 'ddigrid.example.com' -WAPIVersion 'latest' -Credential $infobloxcred -SkipCertificateCheck
 
 function fail_over {
