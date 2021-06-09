@@ -12,6 +12,7 @@ $failoversite = '-dr' # Disaster Recovery
 $infobloxcred = Import-Clixml -Path C:\scripts\infoblox-cred.xml
 Set-IBConfig -ProfileName 'mygrid' -WAPIHost 'ddigrid.example.com' -WAPIVersion 'latest' -Credential $infobloxcred -SkipCertificateCheck
 
+# Define failover function
 function fail_over {
   # Get a copy of the protected site record
   $hostrecord = Get-IBObject -type record:host -Filters "name:=$fqdn"
@@ -23,6 +24,7 @@ function fail_over {
   # Get a copy of the failover site record 
   $drrecord = Get-IBObject -type record:host -Filters "name:=$hostname$failoversite$domainname"
   
+  # Check and make sure the host records exist then do stuff
   if (($hostrecord | Where-Object { $_.'_ref' -like 'record:host/*'}) -And ($drrecord | Where-Object { $_.'_ref' -like 'record:host/*' })) {
     # Append the name of the protected site record with -mdc
     $hostname_changed = "$hostname$protectedsite$domainname"
@@ -54,6 +56,7 @@ function fail_over {
   }
 }
 
+# Define failback function
 function fail_back {
   # Get a copy of the failover site record
   $hostrecord = Get-IBObject -type record:host -Filters "name:=$fqdn"
@@ -65,6 +68,7 @@ function fail_back {
   # Get a copy of the protected site record 
   $mdcrecord = Get-IBObject -type record:host -Filters "name:=$hostname$protectedsite$domainname"
   
+  # Check and make sure the host records exist then do stuff
   if (($hostrecord | Where-Object { $_.'_ref' -like 'record:host/*'}) -and ($mdcrecord | Where-Object { $_.'_ref' -like 'record:host/*' })) {
     
     # Append the name of the failover site record with -dr
@@ -97,6 +101,7 @@ function fail_back {
   }
 }
 
+# Logic to decide which function to call
 if ($failback -eq $true) {
   fail_back
 }
